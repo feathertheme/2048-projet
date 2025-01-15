@@ -1,0 +1,62 @@
+from random import*
+
+
+
+def spawn(T,pos_y,pos_x):
+    pos_y=randint(0,3)
+    pos_x=randint(0,3)
+    return pos_y,pos_x
+
+def generation_valeurs():
+    T = [[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]]
+    pos_y=0
+    pos_x=0
+    spawn(T,pos_y,pos_x)
+    if T[pos_y][pos_x]==0:
+        T[pos_y][pos_x]=2
+    else:
+        spawn(T)
+
+    print(T)
+    return T,pos_x,pos_y
+
+def deplacement(direction_deplacement,pos_x,pos_y,T):
+    a=pos_y
+    b=pos_x
+    frigo=T[pos_y][pos_x]
+    if direction_deplacement == "Z":
+        while a>0 and T[a-1][b]==0:
+            a=a-1
+        
+    elif direction_deplacement == "S":
+        while a<3 and T[a+1][b]==0:
+            a=a+1
+        
+    elif direction_deplacement == "Q":
+        while b>0 and T[a][b-1]==0:
+            b=b-1
+        
+    elif direction_deplacement == "D":
+        while b<3 and T[a][b+1]==0:
+            b=b+1
+        
+    if a!=pos_y or b!=pos_x:
+        T[a][b]=frigo
+        T[pos_y][pos_x]=0
+    return T
+
+
+
+def mouvement():
+    T,x,y = generation_valeurs()
+    direction_deplacement = str(input("Entrez Z ,Q ,S ou D pour faire bouger les tuiles").upper())
+    deplacement(direction_deplacement,x,y,T)
+
+    print(T)
+    return T
+
+
+def game():
+    mouvement()
+
+game()
