@@ -1,0 +1,134 @@
+from random import randint
+
+def spawn(T):
+    pos_y = randint(0, 3)
+    pos_x = randint(0, 3)
+    for row in T:
+        if 0 in row:
+            while T[pos_y][pos_x] != 0:
+                pos_y = randint(0, 3)
+                pos_x = randint(0, 3)
+    T[pos_y][pos_x] = 2
+    return T
+
+def generation_valeurs():
+    T = [[0, 0, 0, 0],
+     [0, 0, 0, 0], 
+     [0, 0, 0, 0], 
+     [0 , 0, 0, 0]]
+    T = spawn(T)
+    print(T)
+    return T
+
+def check_2048(T):
+    """
+    Vérifie si la grille contient la valeur 2048.
+    Retourne True si 2048 est présent, sinon False.
+    """
+    for row in T:
+        if 2048 in row:
+            return True
+    return False
+
+def defaite(T):
+    """Vérifie si la grille est pleine et s'il n'y a plus de mouvements possibles."""
+    # Vérifier s'il reste une case vide
+    for row in T:
+        if 0 in row:
+            return False  # Il y a encore de la place, on peut continuer
+    
+    # Vérifier s'il reste des fusions possibles (horizontales et verticales)
+    for i in range(4):
+        for j in range(4):
+            if j < 3 and T[i][j] == T[i][j+1]:  # Mouvement possible à droite
+                return False
+            if i < 3 and T[i][j] == T[i+1][j]:  # Mouvement possible en bas
+                return False
+            
+    return True  # Aucune case vide et aucun mouvement possible → Défaite
+
+
+def deplacement(direction_deplacement, T):
+    """
+    Lors de l'appel de la fonction, la grille se déplace dans la direction donnée
+    Entrée : string, Tableau
+    sortie : Tableau
+    """
+    if direction_deplacement == "Z": #déplace vers le haut
+        for i in range(4):
+            for j in range(1, 4): #Pour chaque colonne i de la grille (de 0 à 3), on parcourt les lignes j de 1 à 3
+                if T[j][i] != 0:
+                    while j > 0 and T[j-1][i] == 0 :                           
+                        T[j-1][i] = T[j][i]
+                        T[j][i] = 0
+                        j -= 1 #Si l’élément T[j][i] n’est pas zéro, on le déplace vers le haut tant que la case au-dessus (T[x-1][i]) est égal à 0  
+                    if j > 0 and T[j-1][i] == T[j][i] :
+                        T[j-1][i] *= 2
+                        T[j][i] = 0
+                                
+    elif direction_deplacement == "S": #déplace vers le bas
+        for i in range(4):
+            for j in range(2, -1, -1): #Pour chaque colonne i de la grille (de 0 à 3), on parcourt les lignes j de 2 à 0
+                if T[j][i] != 0:
+                    while j < 3 and T[j+1][i] == 0 :
+                        T[j+1][i] = T[j][i]
+                        T[j][i] = 0
+                        j += 1 #Si l’élément T[j][i] n’est pas zéro, on le déplace vers le bas tant que la case au-dessous (T[x+1][i]) est égal à 0
+                    if j < 3 and T[j+1][i] == T[j][i] :
+                        T[j+1][i] *=2
+                        T[j][i] = 0
+    elif direction_deplacement == "Q": #déplacement vers la gauche
+        for i in range(4):
+            for j in range(1, 4): #Pour chaque colonne i de la grille (de 0 à 3), on parcourt les lignes j de 1 à 3
+                if T[i][j] != 0:
+                    while j > 0 and T[i][j-1] == 0 :
+                        T[i][j-1] = T[i][j]
+                        T[i][j] = 0
+                        j -= 1 #Si l’élément T[i][j] n’est pas zéro, on le déplace vers la gauche tant que la case à gauche (T[i][x-1]) est égal à 0
+                    if j > 0 and T[i][j-1] == T[i][j] :
+                        T[i][j-1] *= 2
+                        T[i][j] = 0
+    elif direction_deplacement == "D": #déplacement vers la droite
+        for i in range(4):
+            for j in range(2, -1, -1):
+                if T[i][j] != 0:              
+                    while j < 3 and T[i][j+1] == 0 :
+                        T[i][j+1] = T[i][j]
+                        T[i][j] = 0
+                        j += 1#Si l’élément T[i][j] n’est pas zéro, on le déplace vers la droite tant que la case à droite (T[i][x+1]) est égal à 0
+                    if j < 3 and T[i][j+1] == T[i][j] :
+                        T[i][j+1] *= 2
+                        T[i][j] = 0
+    return T
+
+def mouvement():
+    T = generation_valeurs()
+    while True:
+        direction_deplacement = input("Entrez Z, Q, S ou D pour faire bouger les tuiles: ").upper()
+        if direction_deplacement in ["Z", "Q", "S", "D"]:
+            T_avant = [row[:] for row in T]
+            T = deplacement(direction_deplacement, T)
+            if T != T_avant:
+                T = spawn(T)
+            
+            print(T)
+
+            # Vérification si 2048 est atteint
+            if check_2048(T):
+                print("Félicitations ! Vous avez atteint 2048 !")
+                break  # Fin de la boucle
+
+            # Vérification de la défaite
+            if defaite(T):
+                print(" Partie terminée ! Aucun mouvement possible. ")
+                break  # Fin du jeu (défaite)
+
+        else:
+            print("Entrez Z, Q, S ou D.")
+    return T
+
+def game():
+    mouvement()
+
+
+game()
